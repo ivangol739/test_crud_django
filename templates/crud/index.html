@@ -5,27 +5,10 @@
     <title>Crud Django</title>
 </head>
 <body>
-<h2>as_table</h2>
-    <form method="POST">
+    <form method="POST" novalidate>
         {% csrf_token %}
         <table>
             {{ form.as_table }}
-        </table>
-        <input type="submit" value="Send">
-    </form>
-<h2>as_ul</h2>
-    <form method="POST">
-        {% csrf_token %}
-        <table>
-            {{ form.as_ul }}
-        </table>
-        <input type="submit" value="Send">
-    </form>
-<h2>as_p</h2>
-    <form method="POST">
-        {% csrf_token %}
-        <table>
-            {{ form.as_p }}
         </table>
         <input type="submit" value="Send">
     </form>
