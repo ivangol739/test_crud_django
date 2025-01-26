@@ -1,7 +1,9 @@
-from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
-from .forms import UserForm
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from .models import Person
+from .forms import PersonForm
+from django.forms.models import model_to_dict
+
 
 # def index(request):
 #     if request.method == "POST":
@@ -36,23 +38,70 @@ from .models import Person
 #     return render(request, 'crud/index.html', {"form": userform})
 
 
-# Получение данных из БД
+# # Получение данных из БД
+# def index(request):
+#     people = Person.objects.all()
+#     return render(request, 'crud/index.html', {'people': people})
+#
+#
+# # Сохранение данных в БД
+# def create(request):
+#     if request.method == 'POST':
+#         person = Person()
+#         person.name = request.POST.get('name')
+#         person.age = request.POST.get('age')
+#         person.save()
+#     return HttpResponseRedirect('/')
+#
+#
+# # Изменение данных в БД
+# def edit(request, id):
+#     try:
+#         person = Person.objects.get(id=id)
+#     except Person.DoesNotExist:
+#         return HttpResponseNotFound('<h2>Person not found</h2>')
+#
+#     if request.method == 'POST':
+#         person.name = request.POST.get('name')
+#         person.age = request.POST.get('age')
+#         person.save()
+#         return HttpResponseRedirect('/')
+#     else:
+#         return render(request, 'crud/edit.html', {'person': person})
+#
+#
+# # Удаление данных из БД
+# def delete(request, id):
+#     try:
+#         person = Person.objects.get(id=id)
+#     except Person.DoesNotExist:
+#         return HttpResponseNotFound('<h2>Person not found</h2>')
+#
+#     person.delete()
+#     return HttpResponseRedirect('/')
+
+
+#--------------------------------------------------------------
+#Через формы
+
+#Получение данных
 def index(request):
+    form = PersonForm()
     people = Person.objects.all()
-    return render(request, 'crud/index.html', {'people': people})
+    return render(request, 'crud/index.html', {'form': form, 'people': people})
 
-
-# Сохранение данных в БД
+#Сохранение данных
 def create(request):
     if request.method == 'POST':
-        person = Person()
-        person.name = request.POST.get('name')
-        person.age = request.POST.get('age')
-        person.save()
+        form = PersonForm(request.POST)
+        if form.is_valid():
+            person = Person()
+            person.name = form.cleaned_data['name']
+            person.age = form.cleaned_data['age']
+            person.save()
     return HttpResponseRedirect('/')
 
-
-# Изменение данных в БД
+#Изменение данных
 def edit(request, id):
     try:
         person = Person.objects.get(id=id)
@@ -60,20 +109,22 @@ def edit(request, id):
         return HttpResponseNotFound('<h2>Person not found</h2>')
 
     if request.method == 'POST':
-        person.name = request.POST.get('name')
-        person.age = request.POST.get('age')
-        person.save()
+        form = PersonForm(request.POST)
+        if form.is_valid():
+            person.name = form.cleaned_data['name']
+            person.age = form.cleaned_data['age']
+            person.save()
         return HttpResponseRedirect('/')
     else:
-        return render(request, 'crud/edit.html', {'person': person})
+        form = PersonForm(model_to_dict(person))
+        return render(request, 'crud/edit.html', {'form': form})
 
-
-# Удаление данных из БД
+#Удаление данных
 def delete(request, id):
     try:
         person = Person.objects.get(id=id)
     except Person.DoesNotExist:
         return HttpResponseNotFound('<h2>Person not found</h2>')
-
     person.delete()
     return HttpResponseRedirect('/')
+
